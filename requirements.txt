@@ -1,0 +1,12 @@
+bs4
+dotenv
+openai
+moviepy
+pymupdf 
+python-docx
+langchain
+pymongo[srv]
+langchain-openai
+fastapi[standard]
+langchain-google-genai
+google-generativeai

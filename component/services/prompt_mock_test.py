@@ -1,0 +1,191 @@
+from langchain_core.prompts import PromptTemplate
+from langchain.messages import SystemMessage, HumanMessage
+
+
+"""def MockQuesPrompt(domain_name, topic_name, num_of_question, def_level):
+    out_temp = '[{"question": "<question_text>"}]'
+
+    sys_message = SystemMessage(
+        content=(
+            f"You are an examiner creating a mock test in the domain '{domain_name}' and topic '{topic_name}'. "
+            f"Generate exactly {num_of_question} questions of difficulty '{def_level}'. "
+            "All questions must be strictly relevant to this domain and topic, with no hallucinations or extra text. "
+            "Return the result as a valid JSON array of objects, with exactly the following format and using **double quotes**:\n"
+            f"{out_temp}\n"
+            "Do NOT include explanations, numbering, markdown, or any extra text. Only valid JSON array."
+        )
+    )
+
+    temp = PromptTemplate(
+        template="{sys_message}",
+        input_variables=['sys_message']
+    )
+    prompt = temp.invoke({
+        'sys_message': sys_message.content
+    }).text
+
+    return prompt"""
+
+
+"""def AnswerAnalyzPrompt(domain_name, topic_name, question, answer):
+    sys_message = SystemMessage(
+        content=f"You are a expert eximiner on domain {domain_name} and on topic {topic_name}"
+                "Your task is check the answer is correct or not "
+                "if answer is cortrect more then 80% then conside it as correct answe otherway wrong answer"
+                )
+    hum_message = HumanMessage(
+        content=f"Question was : {question}\n\n Naswer: {answer}"
+    )
+
+    temp = PromptTemplate(
+        template="{sys_message} \n\n {hum_message}",
+        input_variables=['sys_message', 'hum_message']
+    )
+
+    prompt = temp.invoke(
+        input={
+            'sys_message': sys_message.content,
+            'hum_message': hum_message.content
+        }
+    )
+
+    return prompt.text
+    """
+
+
+"""def MockAnsPrompt(domain_name, topic_name, question, answer):
+
+    out_temp = '{"result": "CORRECT or WRONG", "score": "<percentage>%", "correct_answer": "<short explanation>"}'
+
+    sys_message = SystemMessage(
+        content=(
+            f"You are an expert examiner in the domain of '{domain_name}' "
+            f"and specifically in the topic '{topic_name}'.\n\n"
+            "Your task is to evaluate the student's answer based on factual correctness, "
+            "conceptual accuracy, and relevance to the question.\n\n"
+            "Evaluation Rules:\n"
+            "1. Compare the answer directly with the question requirements.\n"
+            "2. If the answer is at least 80% correct, classify it as CORRECT.\n"
+            "3. If the answer is less than 80% correct, classify it as WRONG.\n"
+            "4. Be strict but fair in your judgment.\n\n"
+            f"Return the result in the following format only as a JSON:\n{out_temp}"
+        )
+    )
+
+    hum_message = HumanMessage(
+        content=(
+            f"Question:\n{question}\n\n"
+            f"Student Answer:\n{answer}"
+        )
+    )
+
+    temp = PromptTemplate(
+        template="{sys_message}\n\n{hum_message}",
+        input_variables=["sys_message", "hum_message"]
+    )
+
+    prompt = temp.invoke(
+        {
+            "sys_message": sys_message.content,
+            "hum_message": hum_message.content
+        }
+    )
+
+    return prompt.text """
+
+
+additiona_info = {
+    'Behavioural Interview': 'Practise reflecting on real experiences and demonstrate skills like teamwork, adaptability, and leadership.',
+    'Motivational Interview': 'Test your motivation and passion for law through tailored interview questions.',
+    'Technical Interview': 'Test your legal knowledge and commercial awareness with realistic, firm-style interview questions.',
+    'Situational Interview': 'Respond to real workplace scenarios and show sound judgement, professionalism, and problem-solving.',
+}
+def MockQuesPrompt(segment_name,class_group,  num_of_question):
+    out_temp = '[{"question": "<question_text>"}]'
+
+    # sys_message = SystemMessage(
+    #     content=(
+    #         f"You are an examiner creating a mock test in the '{segment_name}' segment. "
+    #         f"Your questions should be general and suitable for people from all domains, covering all school, college and university departments legal related."
+    #         f"Generate exactly {num_of_question} questions "
+    #         # f"All questions must be strictly relevant to this {segment_name}"
+    #         "Return the result as a valid JSON array of objects, with exactly the following format and using **double quotes**:\n"
+    #         f"{out_temp}\n"
+    #         'Important Reminder: All response text and spellings must be written in British English .'
+    #     )
+    # )
+    sys_message = SystemMessage(
+    content=(
+        f"You are an examiner creating a mock interview based on the title or segment '{segment_name}'. "
+        f"Additional information: {additiona_info.get(segment_name, additiona_info)} "
+        "Generate unique questions eatch time that are directly relevant to this specific segment or mock interview title. "
+        "All questions must be legal or law-related. "
+        "Questions may belong to any appropriate subject or domain depending on the segment provided. "
+        f"Each question must be suitable for Class group {class_group}. "
+        f"Generate exactly {num_of_question} questions — no more and no fewer. "
+        "Return the result as a valid JSON array of objects using double quotes only in the specified format below:\n"
+        f"{out_temp}\n"
+        "All response text and spellings must be written in British English."
+    )
+)
+
+    temp = PromptTemplate(
+        template="{sys_message}",
+        input_variables=['sys_message']
+    )
+    prompt = temp.invoke({
+        'sys_message': sys_message.content
+    }).text
+
+
+    return prompt
+
+
+
+#update prompt as needed 
+def MokeEvaluatePrompt(segment, question, answer):
+
+    prompt = f"""
+        You are an interview evaluator.
+
+        interview Segment: {segment}
+
+        Question: {question}
+        Candidate Answer:
+        {answer}
+
+        Evaluate The answer on a scale of 0-100 for each catagory:
+
+        1.Content_Quality 
+        2.Clarity_Structure
+        3.Communication
+        4.Professional_Attitude
+
+        Return ONLY Valid JSON in this format : 
+
+        {{
+        'interview_crushed': 0-95,
+        "communication_and_clarity": 0-95,
+        "commercial_awareness": 0-95,
+        "problem_solving": 0-95,
+        "professionalism_and_presence": 0-95,
+        "feedback_timeline":
+        {{
+            "opening_hook" :
+            {{
+                secound: if secound none then give 0 (int)
+                text: Great opening hook comment (str)
+            }},
+            "filler_words": Based on the question just give failed like The candidate did not provide any substantive answer or examples, and failed to address the different,
+            "stronger_answer" : Example of a Stronger Answer
+        }}
+        "feedback": {{
+            "strength": "one of strength",
+            "areas_for_improvement": "one areas for improvement"
+        }}
+        }}
+
+        "Important Reminder: All response text and spellings must be written in British English ."
+        """
+    
+    return prompt

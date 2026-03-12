@@ -1,0 +1,119 @@
+from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+
+def CVPrompt(user_data, additional_note):
+    sys_message = SystemMessage(content="Imagine you are a professional CV writer. Your task is to create a detailed CV based on the provided job description and the user's personal bio data.")
+    hum_message = HumanMessage(content=f"User Bio: \n{user_data}")
+
+    temp = PromptTemplate(
+        template="{sys_message}\n. {hum_message} \n. Additional User Input: {additional_note}",
+        input_variables=['sys_message', 'hum_message', 'additional_note']
+    )
+
+    prompt = temp.invoke(input={
+         'sys_message': sys_message.content,
+         'hum_message': hum_message.content,
+         'additional_note': additional_note
+    })
+
+    return prompt.text
+
+
+def DescPrompt(job_summary, job_information):
+    sys_message = SystemMessage(
+        content=(
+            "You are an expert and professional job description writer. "
+            "Your task is to refine and enhance the user-provided job summary strictly "
+            "based on the supplied job experience information. The output will be used "
+            "directly in a CV. Do not hallucinate, assume, infer, or add any information "
+            "And finally just return the refined job description without any additional commentary."
+            "Important Reminder: All response text and spellings must be written in British English ."
+        )
+    )
+
+    hum_message = HumanMessage(
+        content=(
+            f"Job experience information: {job_information}\n\n"
+            f"User written summary: {job_summary}"
+        )
+    )
+
+    temp = PromptTemplate(
+        template="{sys_message}\n\n{hum_message}",
+        input_variables=['sys_message', 'hum_message']
+    )
+
+    prompt = temp.invoke(
+        input={
+            'sys_message': sys_message.content,
+            'hum_message': hum_message.content
+        }
+    ).text
+
+    return prompt
+
+
+def SummPrompt(user_summary, user_data):
+
+    summary_temp = (
+        "Professional summary covering my educational background, relevant work "
+        "experience, core skills, key achievements, and career objectives."
+        "Reminder if any information is missing no warry just use those information avaiable and make objective "
+        "Important Reminder: All response text and spellings must be written in British English ."
+    )
+
+    sys_message = SystemMessage(
+        content=(
+            "You are a professional and expert CV objective writer. The CV objective must "
+            f"cover t hefollowing areas: {summary_temp} "
+            "Your task is to write or refine a CV objective strictly based on the user’s "
+            "pre-written objective (if provided) and the supplied biography data. "
+            "Do not hallucinate, infer, assume, or introduce any new information. "
+            "Ensure the final CV objective is concise, professional, and suitable for a CV. "
+            "The length must be between 80 and 100 words, unless the user specifies a "
+            "different maximum length."
+            "Important Reminder: All response text and spellings must be written in British English ."
+        )
+    )
+
+    hum_message = HumanMessage(
+        content=(
+            f"User written objective: {user_summary}\n\n"
+            f"User biography data: {user_data}"
+        )
+    )
+
+    temp = PromptTemplate(
+        template="{sys_message}\n\n{hum_message}",
+        input_variables=["sys_message", "hum_message"]
+    )
+
+    prompt = temp.invoke(
+        input={
+            "sys_message": sys_message.content,
+            "hum_message": hum_message.content
+        }
+    ).text
+
+    return prompt
+
+
+def CVComplication(cv_data):
+    sys_message = SystemMessage(
+        content="Imagine you are a professional CV Analyzer. "
+        "Your task is to give a complition score range between (35 to 96)"
+        "return just score(integer) no text only score. "
+        )
+    hum_message = HumanMessage(content=f"User Bio: \n{cv_data}")
+
+    temp = PromptTemplate(
+        template="{sys_message}\n. {hum_message} \n",
+        input_variables=['sys_message', 'hum_message']
+    )
+
+    prompt = temp.invoke(input={
+         'sys_message': sys_message.content,
+         'hum_message': hum_message.content
+    })
+
+    return prompt.text
